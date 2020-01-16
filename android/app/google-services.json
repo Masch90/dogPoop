@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "312650485114",
+    "firebase_url": "https://meine-haufen.firebaseio.com",
+    "project_id": "meine-haufen",
+    "storage_bucket": "meine-haufen.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:312650485114:android:b8ffb0a59298d5e8e49ac3",
+        "android_client_info": {
+          "package_name": "com.schliebs.maik"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "312650485114-ljkls1p4im43taae8io5otaao48q3du4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.schliebs.maik",
+            "certificate_hash": "4c20280abfd54a9b05ebeeb57c46f49901dbc1ce"
+          }
+        },
+        {
+          "client_id": "312650485114-f5o400je9guuu33hl796och4tu56l7g4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWr2vPaHEuQt42EkoHB-eqWfiHknADmPc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "312650485114-f5o400je9guuu33hl796och4tu56l7g4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
