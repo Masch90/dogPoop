@@ -22,7 +22,6 @@ class _MyCalendarState extends State<MyCalendar> {
     _calendarController = CalendarController();
     //_calendarController.setFocusedDay(DateTime.now());
     _calendarController.setSelectedDay(DateTime.now());
-    _calendarController.
     final _selectedDay = DateTime.now();
     var _firestoreEvents = await Firestore.instance.collection(collection).getDocuments().then(_events[]);
     _events = {
