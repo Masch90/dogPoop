@@ -18,15 +18,15 @@ class _$HaufenSerializer implements StructuredSerializer<Haufen> {
   Iterable<Object> serialize(Serializers serializers, Haufen object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object>[
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'comment',
+      serializers.serialize(object.comment,
+          specifiedType: const FullType(String)),
       'date',
       serializers.serialize(object.date, specifiedType: const FullType(int)),
       'rating',
       serializers.serialize(object.rating, specifiedType: const FullType(int)),
       'segment',
-      serializers.serialize(object.segment,
-          specifiedType: const FullType(String)),
+      serializers.serialize(object.segment, specifiedType: const FullType(int)),
     ];
 
     return result;
@@ -43,8 +43,8 @@ class _$HaufenSerializer implements StructuredSerializer<Haufen> {
       iterator.moveNext();
       final dynamic value = iterator.current;
       switch (key) {
-        case 'id':
-          result.id = serializers.deserialize(value,
+        case 'comment':
+          result.comment = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
         case 'date':
@@ -57,7 +57,7 @@ class _$HaufenSerializer implements StructuredSerializer<Haufen> {
           break;
         case 'segment':
           result.segment = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(int)) as int;
           break;
       }
     }
@@ -68,20 +68,20 @@ class _$HaufenSerializer implements StructuredSerializer<Haufen> {
 
 class _$Haufen extends Haufen {
   @override
-  final String id;
+  final String comment;
   @override
   final int date;
   @override
   final int rating;
   @override
-  final String segment;
+  final int segment;
 
   factory _$Haufen([void Function(HaufenBuilder) updates]) =>
       (new HaufenBuilder()..update(updates)).build();
 
-  _$Haufen._({this.id, this.date, this.rating, this.segment}) : super._() {
-    if (id == null) {
-      throw new BuiltValueNullFieldError('Haufen', 'id');
+  _$Haufen._({this.comment, this.date, this.rating, this.segment}) : super._() {
+    if (comment == null) {
+      throw new BuiltValueNullFieldError('Haufen', 'comment');
     }
     if (date == null) {
       throw new BuiltValueNullFieldError('Haufen', 'date');
@@ -105,7 +105,7 @@ class _$Haufen extends Haufen {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is Haufen &&
-        id == other.id &&
+        comment == other.comment &&
         date == other.date &&
         rating == other.rating &&
         segment == other.segment;
@@ -114,14 +114,14 @@ class _$Haufen extends Haufen {
   @override
   int get hashCode {
     return $jf($jc(
-        $jc($jc($jc(0, id.hashCode), date.hashCode), rating.hashCode),
+        $jc($jc($jc(0, comment.hashCode), date.hashCode), rating.hashCode),
         segment.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('Haufen')
-          ..add('id', id)
+          ..add('comment', comment)
           ..add('date', date)
           ..add('rating', rating)
           ..add('segment', segment))
@@ -132,9 +132,9 @@ class _$Haufen extends Haufen {
 class HaufenBuilder implements Builder<Haufen, HaufenBuilder> {
   _$Haufen _$v;
 
-  String _id;
-  String get id => _$this._id;
-  set id(String id) => _$this._id = id;
+  String _comment;
+  String get comment => _$this._comment;
+  set comment(String comment) => _$this._comment = comment;
 
   int _date;
   int get date => _$this._date;
@@ -144,15 +144,15 @@ class HaufenBuilder implements Builder<Haufen, HaufenBuilder> {
   int get rating => _$this._rating;
   set rating(int rating) => _$this._rating = rating;
 
-  String _segment;
-  String get segment => _$this._segment;
-  set segment(String segment) => _$this._segment = segment;
+  int _segment;
+  int get segment => _$this._segment;
+  set segment(int segment) => _$this._segment = segment;
 
   HaufenBuilder();
 
   HaufenBuilder get _$this {
     if (_$v != null) {
-      _id = _$v.id;
+      _comment = _$v.comment;
       _date = _$v.date;
       _rating = _$v.rating;
       _segment = _$v.segment;
@@ -177,7 +177,8 @@ class HaufenBuilder implements Builder<Haufen, HaufenBuilder> {
   @override
   _$Haufen build() {
     final _$result = _$v ??
-        new _$Haufen._(id: id, date: date, rating: rating, segment: segment);
+        new _$Haufen._(
+            comment: comment, date: date, rating: rating, segment: segment);
     replace(_$result);
     return _$result;
   }
