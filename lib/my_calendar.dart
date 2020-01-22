@@ -32,7 +32,13 @@ class _MyCalendarState extends State<MyCalendar> {
 
   void _onDaySelected(DateTime day, List events) {
     setState(() {
-      if (events.isNotEmpty) _selectedEvents = events;
+      events = events.cast<Haufen>();
+      if (events.isNotEmpty) {
+        _selectedEvents = events;
+      } else {
+        _selectedEvents = [];
+      }
+      _selectedEvents = events;
       _getEvents();
     });
   }
@@ -71,6 +77,10 @@ class _MyCalendarState extends State<MyCalendar> {
   }
 
   _buildEventList() {
+    if (_selectedEvents.length < 3) {
+      _fillUpSelectedEvents();
+    }
+    _selectedEvents.sort((a, b) => a.segment.compareTo(b.segment));
     return ListView(
       children: _selectedEvents
           .map((event) => Card(
@@ -82,14 +92,27 @@ class _MyCalendarState extends State<MyCalendar> {
                   margin: const EdgeInsets.symmetric(
                       horizontal: 8.0, vertical: 4.0),
                   child: ListTile(
-                    title: Row(
-                      children: <Widget>[
-                        _getEmoticon(event.rating),
-                        Text(event.comment),
-                      ],
-                    ),
-                    onTap: () => print('$event tapped!'),
-                  ),
+                      title: Row(
+                        children: <Widget>[
+                          _getEmoticon(event.rating),
+                          Flexible(child: Text(event.comment)),
+                        ],
+                      ),
+                      onTap: () {
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return Column(
+                                children: <Widget>[
+                                  ListTile(
+                                    leading: Icon(Icons.thumb_up),
+                                    title: Text('Neuer Haufen'),
+                                  )
+                                ],
+                              );
+                            });
+                        print('$event tapped!');
+                      }),
                 ),
               ))
           .toList(),
@@ -120,6 +143,9 @@ class _MyCalendarState extends State<MyCalendar> {
     Color iconColor = Colors.black;
     IconData iconData = Icons.sentiment_dissatisfied;
     switch (rating) {
+      case 0:
+        iconData = Icons.pets;
+        break;
       case 1:
         iconColor = Colors.red[900];
         iconData = Icons.sentiment_very_dissatisfied;
@@ -146,5 +172,25 @@ class _MyCalendarState extends State<MyCalendar> {
       color: iconColor,
       size: iconSize,
     );
+  }
+
+  void _fillUpSelectedEvents() {
+    List<Haufen> displayList = [];
+    _selectedEvents.forEach((element) => displayList.add(element));
+    for (var i = 1; i < 4; i++) {
+      if (!displayList.any((element) {
+        return element.segment == i;
+      })) {
+        HaufenBuilder haufenBuilder = HaufenBuilder();
+        haufenBuilder.comment = 'klick hier um einen neuen Haufen anzulegen';
+        haufenBuilder.rating = 0;
+        haufenBuilder.segment = i;
+        haufenBuilder.date = 0;
+        displayList.add(haufenBuilder.build());
+      }
+    }
+    setState(() {
+      _selectedEvents = displayList;
+    });
   }
 }
