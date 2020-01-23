@@ -14,7 +14,7 @@ class MyCalendar extends StatefulWidget {
 
 class _MyCalendarState extends State<MyCalendar> {
   CalendarController _calendarController;
-  Map<DateTime, List<Haufen>> _events = {};
+  Future<Map<DateTime, List<Haufen>>> _events;
   DateTime _selectedDay;
   List<Haufen> _selectedEvents = [];
 
@@ -22,6 +22,7 @@ class _MyCalendarState extends State<MyCalendar> {
   void initState() {
     super.initState();
     _calendarController = CalendarController();
+    _events = _getEventsTest();
   }
 
   @override
@@ -39,14 +40,22 @@ class _MyCalendarState extends State<MyCalendar> {
         _selectedEvents = [];
       }
       _selectedEvents = events;
-      _getEvents();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
-      _buildCalendar(),
+      FutureBuilder(
+        future: _events,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return _buildCalendar(snapshot.data);
+          } else {
+            return CircularProgressIndicator();
+          }
+        },
+      ),
       const SizedBox(height: 8.0),
       Expanded(
         child: _buildEventList(),
@@ -54,7 +63,7 @@ class _MyCalendarState extends State<MyCalendar> {
     ]);
   }
 
-  Widget _buildCalendar() {
+  Widget _buildCalendar(snapshot) {
     return TableCalendar(
       calendarController: _calendarController,
       initialCalendarFormat: CalendarFormat.month,
@@ -65,7 +74,7 @@ class _MyCalendarState extends State<MyCalendar> {
         CalendarFormat.month: '',
       },
       holidays: holidays,
-      events: _events,
+      events: snapshot,
       calendarStyle: CalendarStyle(
         selectedColor: Colors.blueAccent[400],
         todayColor: Colors.grey[400],
@@ -95,20 +104,28 @@ class _MyCalendarState extends State<MyCalendar> {
                       title: Row(
                         children: <Widget>[
                           _getEmoticon(event.rating),
+                          SizedBox(width: 8.0),
                           Flexible(child: Text(event.comment)),
                         ],
                       ),
                       onTap: () {
+                        List<Widget> modalEntries = [];
+                        if (event.rating == 0) {
+                          // header
+                          modalEntries.add(ListTile(
+                            title: Center(child: Text('Neuer Haufen')),
+                          ));
+                          List<DropdownMenuItem<String>> dropDownMenuItems = [];
+                          dropDownMenuItems.add(DropdownMenuItem(value: '1', child: Text('Früh')));
+                          modalEntries.add(Column(children: <Widget>[Text('Tageszeit:')],));
+                        } else {
+                          // update or delete
+                        }
                         showModalBottomSheet(
                             context: context,
                             builder: (context) {
                               return Column(
-                                children: <Widget>[
-                                  ListTile(
-                                    leading: Icon(Icons.thumb_up),
-                                    title: Text('Neuer Haufen'),
-                                  )
-                                ],
+                                children: modalEntries,
                               );
                             });
                         print('$event tapped!');
@@ -135,7 +152,26 @@ class _MyCalendarState extends State<MyCalendar> {
         }
       });
     });
-    _events = events;
+    // _events = events;
+  }
+
+  Future<Map<DateTime, List<Haufen>>> _getEventsTest() async {
+    Map<DateTime, List<Haufen>> events = {};
+    await Firestore.instance
+        .collection(collection)
+        .getDocuments()
+        .then((snapshot) {
+      snapshot.documents.forEach((document) {
+        Haufen haufen = Haufen.fromJson(jsonEncode(document.data));
+        if (events
+            .containsKey(DateTime.fromMillisecondsSinceEpoch(haufen.date))) {
+          events[DateTime.fromMillisecondsSinceEpoch(haufen.date)].add(haufen);
+        } else {
+          events[DateTime.fromMillisecondsSinceEpoch(haufen.date)] = [haufen];
+        }
+      });
+    });
+    return events;
   }
 
   Icon _getEmoticon(int rating) {
