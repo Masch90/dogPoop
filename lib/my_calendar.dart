@@ -17,6 +17,7 @@ class _MyCalendarState extends State<MyCalendar> {
   Future<Map<DateTime, List<Haufen>>> _events;
   DateTime _selectedDay;
   List<Haufen> _selectedEvents = [];
+  String _dropDownValue;
 
   @override
   void initState() {
@@ -115,9 +116,44 @@ class _MyCalendarState extends State<MyCalendar> {
                           modalEntries.add(ListTile(
                             title: Center(child: Text('Neuer Haufen')),
                           ));
+                          switch (event.segment) {
+                            case 1:
+                              _dropDownValue = 'Früh';
+                              break;
+                            case 2:
+                              _dropDownValue = 'Nachmittag';
+                              break;
+                            case 3:
+                              _dropDownValue = 'Abend';
+                              break;
+                          }
                           List<DropdownMenuItem<String>> dropDownMenuItems = [];
-                          dropDownMenuItems.add(DropdownMenuItem(value: '1', child: Text('Früh')));
-                          modalEntries.add(Column(children: <Widget>[Text('Tageszeit:')],));
+                          dropDownMenuItems.add(DropdownMenuItem(
+                              value: 'Früh', child: Text('Früh')));
+                          dropDownMenuItems.add(DropdownMenuItem(
+                              value: 'Nachmittag', child: Text('Nachmittag')));
+                          dropDownMenuItems.add(DropdownMenuItem(
+                              value: 'Abend', child: Text('Abend')));
+                          modalEntries.add(Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Text('Tageszeit:'),
+                                  DropdownButton<String>(
+                                    value: _dropDownValue,
+                                    items: dropDownMenuItems,
+                                    onChanged: (String value) {
+                                      print(value);
+                                      setState(() {
+                                        _dropDownValue = value;
+                                      });
+                                      print(_dropDownValue);
+                                    },
+                                  ),
+                                ],
+                              )
+                            ],
+                          ));
                         } else {
                           // update or delete
                         }
