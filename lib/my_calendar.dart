@@ -23,7 +23,7 @@ class _MyCalendarState extends State<MyCalendar> {
   void initState() {
     super.initState();
     _calendarController = CalendarController();
-    _events = _getEventsTest();
+    _events = _getEvents();
   }
 
   @override
@@ -110,53 +110,7 @@ class _MyCalendarState extends State<MyCalendar> {
                         ],
                       ),
                       onTap: () {
-                        List<Widget> modalEntries = [];
-                        if (event.rating == 0) {
-                          // header
-                          modalEntries.add(ListTile(
-                            title: Center(child: Text('Neuer Haufen')),
-                          ));
-                          switch (event.segment) {
-                            case 1:
-                              _dropDownValue = 'Früh';
-                              break;
-                            case 2:
-                              _dropDownValue = 'Nachmittag';
-                              break;
-                            case 3:
-                              _dropDownValue = 'Abend';
-                              break;
-                          }
-                          List<DropdownMenuItem<String>> dropDownMenuItems = [];
-                          dropDownMenuItems.add(DropdownMenuItem(
-                              value: 'Früh', child: Text('Früh')));
-                          dropDownMenuItems.add(DropdownMenuItem(
-                              value: 'Nachmittag', child: Text('Nachmittag')));
-                          dropDownMenuItems.add(DropdownMenuItem(
-                              value: 'Abend', child: Text('Abend')));
-                          modalEntries.add(Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Text('Tageszeit:'),
-                                  DropdownButton<String>(
-                                    value: _dropDownValue,
-                                    items: dropDownMenuItems,
-                                    onChanged: (String value) {
-                                      print(value);
-                                      setState(() {
-                                        _dropDownValue = value;
-                                      });
-                                      print(_dropDownValue);
-                                    },
-                                  ),
-                                ],
-                              )
-                            ],
-                          ));
-                        } else {
-                          // update or delete
-                        }
+                        List<Widget> modalEntries = _getModalEntries(event);
                         showModalBottomSheet(
                             context: context,
                             builder: (context) {
@@ -172,26 +126,7 @@ class _MyCalendarState extends State<MyCalendar> {
     );
   }
 
-  void _getEvents() async {
-    Map<DateTime, List<Haufen>> events = {};
-    await Firestore.instance
-        .collection(collection)
-        .getDocuments()
-        .then((snapshot) {
-      snapshot.documents.forEach((document) {
-        Haufen haufen = Haufen.fromJson(jsonEncode(document.data));
-        if (events
-            .containsKey(DateTime.fromMillisecondsSinceEpoch(haufen.date))) {
-          events[DateTime.fromMillisecondsSinceEpoch(haufen.date)].add(haufen);
-        } else {
-          events[DateTime.fromMillisecondsSinceEpoch(haufen.date)] = [haufen];
-        }
-      });
-    });
-    // _events = events;
-  }
-
-  Future<Map<DateTime, List<Haufen>>> _getEventsTest() async {
+  Future<Map<DateTime, List<Haufen>>> _getEvents() async {
     Map<DateTime, List<Haufen>> events = {};
     await Firestore.instance
         .collection(collection)
@@ -264,5 +199,81 @@ class _MyCalendarState extends State<MyCalendar> {
     setState(() {
       _selectedEvents = displayList;
     });
+  }
+
+  List<Widget> _getModalEntries(Haufen event) {
+    List<Widget> modalEntries = [];
+    if (event.rating == 0) {
+      // header
+      modalEntries.add(ListTile(
+        title: Center(child: Text('Neuer Haufen')),
+      ));
+      switch (event.segment) {
+        case 1:
+          _dropDownValue = 'Früh';
+          break;
+        case 2:
+          _dropDownValue = 'Nachmittag';
+          break;
+        case 3:
+          _dropDownValue = 'Abend';
+          break;
+      }
+      List<DropdownMenuItem<String>> dropDownMenuItems = [];
+      dropDownMenuItems
+          .add(DropdownMenuItem(value: 'Früh', child: Text('Früh')));
+      dropDownMenuItems.add(
+          DropdownMenuItem(value: 'Nachmittag', child: Text('Nachmittag')));
+      dropDownMenuItems
+          .add(DropdownMenuItem(value: 'Abend', child: Text('Abend')));
+      modalEntries.add(Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Text('Tageszeit:'),
+              DropdownButton<String>(
+                value: _dropDownValue,
+                items: dropDownMenuItems,
+                onChanged: (String value) {
+                  print(value);
+                  setState(() {
+                    _dropDownValue = value;
+                  });
+                  print(_dropDownValue);
+                },
+              ),
+            ],
+          )
+        ],
+      ));
+    } else {
+      // update or delete
+      modalEntries.add(ListTile(
+        title: Center(
+          child: Text('Haufen updaten oder aufsammeln'),
+        ),
+      ));
+      modalEntries.add(
+        ListTile(
+          title: Row(
+            children: <Widget>[
+              FlatButton.icon(
+                icon: Icon(
+                  Icons.delete_forever,
+                  color: Colors.red,
+                ),
+                onPressed: () {
+                  print('delete tapped');
+                },
+                label: Text(
+                  'löschen',
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+    return modalEntries;
   }
 }
